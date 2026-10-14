@@ -155,6 +155,28 @@
   .month h3 { margin: 0; font-size: 20px; font-weight: 800; }
   .month span { color: var(--muted); font-size: 14px; }
   .list { display: grid; gap: 10px; }
+  /* later months: compact, collapsible */
+  .mgroup { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; box-shadow: var(--shadow); margin-top: 12px; }
+  .mgroup > summary { list-style: none; cursor: pointer; padding: 14px 16px; display: block; color: inherit; }
+  .mgroup > summary::-webkit-details-marker { display: none; }
+  .mgroup > summary::after { content: none; }
+  .mgroup > summary:focus-visible { outline: 3px solid var(--sun); outline-offset: 2px; border-radius: 16px; }
+  .mhead { display: flex; align-items: baseline; gap: 8px; }
+  .mhead h3 { margin: 0; font-size: 19px; font-weight: 800; }
+  .mhead span { color: var(--muted); font-size: 14px; }
+  .mhead .chev { margin-inline-start: auto; width: 28px; height: 28px; border-radius: 50%; background: var(--surface-2);
+    display: inline-flex; align-items: center; justify-content: center; align-self: center; }
+  .mhead .chev::before { content: "▾"; color: var(--brand); font-size: 14px; transition: transform .2s; }
+  .mgroup[open] .mhead .chev::before { transform: rotate(180deg); }
+  .peek { list-style: none; margin: 10px 0 0; padding: 0; display: grid; gap: 6px; }
+  .peek li { display: flex; gap: 10px; align-items: baseline; font-size: 15px; min-width: 0; }
+  .peek li::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--c); flex: none; transform: translateY(-1px); }
+  .peek .pd { color: var(--muted); font-size: 13px; min-width: 56px; direction: ltr; text-align: right; font-variant-numeric: tabular-nums; }
+  .peek .pt { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .peek li.more { color: var(--brand); font-size: 14px; font-weight: 500; }
+  .peek li.more::before { background: transparent; }
+  .mgroup[open] .peek { display: none; }
+  .mgroup > .list { padding: 0 12px 12px; }
   .card { --c: var(--brand); background: var(--surface); border: 1px solid var(--line); border-radius: 16px;
     box-shadow: var(--shadow); display: grid; grid-template-columns: 64px 1fr; overflow: hidden; position: relative; }
   .card.past { opacity: .55; }
@@ -367,6 +389,20 @@ function renderNext(list) {
       <div class="meta">${nxt.s.getDate()} ב${MONTHS[nxt.s.getMonth()]} · ${esc(whenText(nxt))}</div></div>`;
 }
 
+// Month keys are 'YYYY-M'; months the reader opened stay open across re-renders (filters, live refresh).
+const monthKey = d => d.getFullYear() + '-' + d.getMonth();
+const openMonths = new Set();
+
+function shortDate(e) {
+  if (!e.multi) return `${e.s.getDate()}.${e.s.getMonth() + 1}`;
+  return e.s.getMonth() === e.en.getMonth() ? `${e.s.getDate()}–${e.en.getDate()}.${e.en.getMonth() + 1}`
+    : `${e.s.getDate()}.${e.s.getMonth() + 1}–${e.en.getDate()}.${e.en.getMonth() + 1}`;
+}
+
+function monthHeader(first, n) {
+  return `<h3>${MONTHS[first.s.getMonth()]} ${first.s.getFullYear()}</h3><span>${n === 1 ? 'אירוע אחד' : n + ' אירועים'}</span>`;
+}
+
 function render() {
   const list = events.filter(e => selected.has(e.cal));
   renderNext(list);
@@ -375,18 +411,45 @@ function render() {
   tl.innerHTML = '';
   if (!selected.size) { tl.innerHTML = '<p class="empty">בחרו לפחות שכבה אחת כדי לראות אירועים.</p>'; return; }
   if (!shown.length) { tl.innerHTML = '<p class="empty">אין אירועים להצגה.</p>'; return; }
-  let key = '', listEl;
+
+  const groups = new Map();
   for (const e of shown) {
-    const k = e.s.getFullYear() + '-' + e.s.getMonth();
-    if (k !== key) {
-      key = k;
-      const n = shown.filter(x => x.s.getFullYear() + '-' + x.s.getMonth() === k).length;
+    const k = monthKey(e.s);
+    if (!groups.has(k)) groups.set(k, []);
+    groups.get(k).push(e);
+  }
+  // The month shown in full: this month, or the first month that still has upcoming events.
+  const upcoming = shown.find(e => e.en >= today);
+  const focus = groups.has(monthKey(today)) && groups.get(monthKey(today)).some(e => e.en >= today)
+    ? monthKey(today) : upcoming && monthKey(upcoming.s);
+
+  for (const [k, evs] of groups) {
+    if (k === focus) {
       const h = document.createElement('div'); h.className = 'month';
-      h.innerHTML = `<h3>${MONTHS[e.s.getMonth()]} ${e.s.getFullYear()}</h3><span>${n} אירועים</span>`;
-      listEl = document.createElement('div'); listEl.className = 'list';
+      h.innerHTML = monthHeader(evs[0], evs.length);
+      const listEl = document.createElement('div'); listEl.className = 'list';
+      evs.forEach(e => listEl.append(card(e)));
       tl.append(h, listEl);
+      continue;
     }
-    listEl.append(card(e));
+    // Other months: one compact card with a short preview; full cards are built when opened.
+    const PEEK = 4;
+    const d = document.createElement('details');
+    d.className = 'mgroup';
+    d.innerHTML = `<summary><div class="mhead">${monthHeader(evs[0], evs.length)}<span class="chev" aria-hidden="true"></span></div>
+      <ul class="peek">${evs.slice(0, PEEK).map(e => `<li style="--c:${CAL[e.cal].color}"><span class="pd">${shortDate(e)}</span><span class="pt">${esc(e.title)}</span></li>`).join('')}
+      ${evs.length > PEEK ? `<li class="more">${evs.length - PEEK === 1 ? 'ועוד אירוע אחד' : `ועוד ${evs.length - PEEK} אירועים`}</li>` : ''}</ul></summary>`;
+    const fill = () => {
+      if (d.querySelector('.list')) return;
+      const listEl = document.createElement('div'); listEl.className = 'list';
+      evs.forEach(e => listEl.append(card(e)));
+      d.append(listEl);
+    };
+    d.addEventListener('toggle', () => {
+      if (d.open) { openMonths.add(k); fill(); } else openMonths.delete(k);
+    });
+    if (openMonths.has(k)) { d.open = true; fill(); }
+    tl.append(d);
   }
 }
 
