@@ -1,0 +1,8 @@
+# private: Claude Code instructions, permissions and the account guard (they name other accounts)
+CLAUDE.md
+.claude/
+# build output and fetched data (the GitHub Action rebuilds both)
+site/dist/
+site/data.json
+__pycache__/
+node_modules/

@@ -1,0 +1,455 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>נוער חלח״צ – לוח אירועים</title>
+<meta name="description" content="כל אירועי הנוער בחלח״צ לשנת תשפ״ז – פעולות התנועה, טיולים, מחנות ואירועי ועדת הנוער – לפי שכבה, עם הוספה ליומן.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #faf6ec;
+    --surface: #ffffff;
+    --surface-2: #f2ede0;
+    --text: #1f2a22;
+    --muted: #5d685f;
+    --line: #e4dccb;
+    --brand: #1f6b3d;
+    --brand-ink: #ffffff;
+    --sun: #f2b33d;
+    --shadow: 0 1px 2px rgba(40, 35, 20, .06), 0 4px 14px rgba(40, 35, 20, .06);
+    /* calendar colors, matching the sheet and the Google calendars */
+    --c-young: #273777;
+    --c-old: #d9222a;
+    --c-12: #d9127d;
+    --c-trips: #0b3a78;
+    --c-coord: #b7790f;
+    --c-service: #9a4f86;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #141a16; --surface: #1d2520; --surface-2: #252f29; --text: #eef2ec; --muted: #a9b5ac;
+      --line: #2f3a33; --brand: #4fb477; --brand-ink: #0d1a12; --sun: #f2b33d;
+      --shadow: 0 1px 2px rgba(0,0,0,.3), 0 6px 18px rgba(0,0,0,.25);
+      --c-young: #8f9fe8; --c-old: #ff6b70; --c-12: #ff6fb5; --c-trips: #6ea8ff; --c-coord: #f2b33d; --c-service: #d99acb;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #141a16; --surface: #1d2520; --surface-2: #252f29; --text: #eef2ec; --muted: #a9b5ac;
+    --line: #2f3a33; --brand: #4fb477; --brand-ink: #0d1a12; --sun: #f2b33d;
+    --shadow: 0 1px 2px rgba(0,0,0,.3), 0 6px 18px rgba(0,0,0,.25);
+    --c-young: #8f9fe8; --c-old: #ff6b70; --c-12: #ff6fb5; --c-trips: #6ea8ff; --c-coord: #f2b33d; --c-service: #d99acb;
+  }
+
+  * { box-sizing: border-box; }
+  [hidden] { display: none !important; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0; background: var(--bg); color: var(--text);
+    font-family: "Rubik", system-ui, -apple-system, "Segoe UI", Arial, sans-serif;
+    font-size: 16px; line-height: 1.5;
+  }
+  a { color: inherit; }
+  .wrap { max-width: 760px; margin: 0 auto; padding: 0 16px; }
+
+  /* top menu */
+  :root { --nav-h: 56px; }
+  nav.top { position: sticky; top: 0; z-index: 10; height: var(--nav-h); background: #123f24; color: #fff;
+    box-shadow: 0 1px 0 rgba(255,255,255,.06), 0 4px 14px rgba(0,0,0,.18); }
+  nav.top .wrap { height: 100%; display: flex; align-items: center; gap: 14px; }
+  nav.top .brand { font-weight: 800; font-size: 18px; white-space: nowrap; text-decoration: none; }
+  nav.top .brand span { color: var(--sun); }
+  nav.top ul { list-style: none; margin: 0 auto 0 0; padding: 0; display: flex; gap: 4px; overflow-x: auto; scrollbar-width: none; }
+  nav.top ul::-webkit-scrollbar { display: none; }
+  nav.top a.item { display: inline-flex; align-items: center; min-height: 40px; padding: 0 12px; border-radius: 99px;
+    text-decoration: none; font-size: 15px; font-weight: 500; white-space: nowrap; color: rgba(255,255,255,.88); }
+  nav.top a.item:hover { background: rgba(255,255,255,.1); }
+  nav.top a.item[aria-current="true"] { background: var(--sun); color: #3b2a00; }
+  nav.top a:focus-visible { outline: 3px solid var(--sun); outline-offset: 2px; }
+  @media (max-width: 560px) {
+    nav.top .brand { display: none; }
+    nav.top ul { margin: 0 auto; gap: 0; }
+    nav.top a.item { font-size: 14px; padding: 0 9px; }
+  }
+  @media (max-width: 380px) { nav.top a.item { font-size: 13.5px; padding: 0 6px; } }
+  #next, #grades, #events, #subscribe { scroll-margin-top: calc(var(--nav-h) + 16px); }
+  html { scroll-behavior: smooth; }
+  @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+
+  /* header */
+  header.hero {
+    /* photo: img/hero.jpg (CC0, see img/CREDITS.txt) under a green overlay that keeps the text readable; same in both themes */
+    background:
+      linear-gradient(180deg, rgba(14, 52, 29, .82) 0%, rgba(20, 77, 43, .62) 55%, rgba(14, 52, 29, .78) 100%),
+      url("img/hero.jpg") center 62% / cover no-repeat, #1f6b3d;
+    color: #fff; padding: 40px 0 76px; position: relative; overflow: hidden;
+  }
+  header.hero::after { /* rolling fields */
+    content: ""; position: absolute; inset: auto -10% -40px -10%; height: 90px;
+    background: var(--bg); border-radius: 50% 50% 0 0 / 100% 100% 0 0;
+  }
+  .hero .eyebrow { display: inline-flex; gap: 6px; align-items: center; font-size: 13px; font-weight: 500;
+    background: rgba(255,255,255,.14); padding: 4px 10px; border-radius: 99px; }
+  .hero .eyebrow i { width: 8px; height: 8px; border-radius: 50%; background: #8ff0b0; display: inline-block;
+    box-shadow: 0 0 0 0 rgba(143,240,176,.7); animation: pulse 2.4s infinite; }
+  @keyframes pulse { 70% { box-shadow: 0 0 0 8px rgba(143,240,176,0); } 100% { box-shadow: 0 0 0 0 rgba(143,240,176,0); } }
+  @media (prefers-reduced-motion: reduce) { .hero .eyebrow i { animation: none; } }
+  .hero h1 { font-size: clamp(30px, 8vw, 44px); line-height: 1.1; margin: 14px 0 6px; font-weight: 800; letter-spacing: -.5px; }
+  .hero h1 span { color: var(--sun); }
+  .hero p { margin: 0; font-size: 17px; opacity: .95; max-width: 34ch; text-shadow: 0 1px 8px rgba(0,0,0,.35); }
+  .hero h1 { text-shadow: 0 2px 14px rgba(0,0,0,.35); }
+  .hero .notify { display: inline-flex; align-items: center; gap: 8px; margin-top: 14px; padding: 8px 14px; min-height: 40px;
+    border-radius: 14px; background: rgba(255,255,255,.16); border: 1px solid rgba(255,255,255,.28); color: #fff;
+    font-size: 15px; font-weight: 500; text-decoration: none; backdrop-filter: blur(4px); }
+  .hero .notify:hover { background: rgba(255,255,255,.24); }
+  /* the bell rings three times shortly after the page opens */
+  .hero .notify .bell { display: inline-block; transform-origin: 50% 8%; font-size: 18px;
+    animation: ring 1s ease-in-out .6s 3; }
+  @keyframes ring {
+    0%, 100% { transform: rotate(0); }
+    10% { transform: rotate(24deg); } 25% { transform: rotate(-20deg); }
+    40% { transform: rotate(14deg); } 55% { transform: rotate(-10deg); }
+    70% { transform: rotate(5deg); } 85% { transform: rotate(-2deg); }
+  }
+  @media (prefers-reduced-motion: reduce) { .hero .notify .bell { animation: none; } }
+  .hero .notify .txt { line-height: 1.45; }
+  .hero .notify:focus-visible { outline: 3px solid var(--sun); outline-offset: 2px; }
+
+  /* next-up card */
+  .next { position: relative; z-index: 1; margin-top: -48px; background: var(--surface); border-radius: 18px;
+    box-shadow: var(--shadow); padding: 16px; display: grid; grid-template-columns: auto 1fr; gap: 14px; align-items: center;
+    border: 1px solid var(--line); }
+  .next .count { background: var(--sun); color: #3b2a00; border-radius: 14px; padding: 10px 12px; text-align: center; min-width: 76px; }
+  .next .count b { display: block; font-size: 28px; line-height: 1; font-weight: 800; }
+  .next .count small { font-size: 12px; font-weight: 500; }
+  .next .label { font-size: 13px; color: var(--muted); font-weight: 500; }
+  .next .title { font-size: 19px; font-weight: 700; margin: 2px 0; line-height: 1.25; }
+  .next .meta { font-size: 14px; color: var(--muted); }
+
+  /* section titles */
+  h2.section { font-size: 15px; font-weight: 700; color: var(--muted); margin: 28px 0 10px; letter-spacing: .2px; }
+
+  /* filter chips */
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; }
+  .chip { --c: var(--brand); appearance: none; border: 1.5px solid var(--line); background: var(--surface); color: var(--text);
+    font: inherit; font-size: 15px; font-weight: 500; padding: 8px 14px 8px 12px; border-radius: 99px; cursor: pointer;
+    display: inline-flex; align-items: center; gap: 8px; min-height: 40px; transition: background .15s, border-color .15s; }
+  .chip .dot { width: 10px; height: 10px; border-radius: 50%; background: var(--c); flex: none; }
+  .chip small { color: var(--muted); font-weight: 400; font-size: 13px; }
+  .chip[aria-pressed="true"] { border-color: var(--c); background: color-mix(in srgb, var(--c) 12%, var(--surface)); }
+  .chip[aria-pressed="true"]::after { content: "✓"; font-size: 13px; color: var(--c); font-weight: 700; }
+  .chip:focus-visible, .btn:focus-visible, summary:focus-visible, .toggle input:focus-visible + span { outline: 3px solid var(--sun); outline-offset: 2px; }
+  .chips.staff { margin-top: 8px; }
+  .chips.staff .chip { font-size: 14px; min-height: 36px; padding: 6px 12px 6px 10px; }
+  .row { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-top: 14px; flex-wrap: wrap; }
+  .toggle { display: inline-flex; align-items: center; gap: 8px; font-size: 14px; color: var(--muted); cursor: pointer; }
+  .toggle input { width: 18px; height: 18px; accent-color: var(--brand); }
+  .linkbtn { background: none; border: 0; font: inherit; font-size: 14px; color: var(--brand); text-decoration: underline; cursor: pointer; padding: 4px; }
+
+  /* timeline */
+  .month { position: sticky; top: var(--nav-h); z-index: 2; background: var(--bg); padding: 14px 0 8px; margin-top: 8px;
+    display: flex; align-items: baseline; gap: 8px; }
+  .month h3 { margin: 0; font-size: 20px; font-weight: 800; }
+  .month span { color: var(--muted); font-size: 14px; }
+  .list { display: grid; gap: 10px; }
+  .card { --c: var(--brand); background: var(--surface); border: 1px solid var(--line); border-radius: 16px;
+    box-shadow: var(--shadow); display: grid; grid-template-columns: 64px 1fr; overflow: hidden; position: relative; }
+  .card.past { opacity: .55; }
+  .card.today { outline: 2px solid var(--sun); }
+  .date { background: color-mix(in srgb, var(--c) 10%, var(--surface)); border-inline-start: 5px solid var(--c);
+    display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 10px 4px; text-align: center; }
+  .date .dow { font-size: 12px; color: var(--muted); font-weight: 500; }
+  .date .d { font-size: 26px; font-weight: 800; line-height: 1.05; color: var(--c); }
+  .date .m { font-size: 12px; color: var(--muted); }
+  .body { padding: 12px 14px; min-width: 0; }
+  .tag { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 700; color: var(--c);
+    background: color-mix(in srgb, var(--c) 10%, transparent); padding: 2px 8px; border-radius: 99px; }
+  .card h4 { margin: 6px 0 4px; font-size: 17px; line-height: 1.3; font-weight: 700; }
+  .when, .where { font-size: 14px; color: var(--muted); display: flex; gap: 6px; align-items: flex-start; }
+  .where a { color: var(--brand); text-decoration: none; border-bottom: 1px dashed currentColor; }
+  .ico { width: 16px; height: 16px; flex: none; margin-top: 3px; }
+  .actions { display: flex; gap: 14px; margin-top: 8px; flex-wrap: wrap; }
+  .actions a { font-size: 14px; font-weight: 500; color: var(--brand); text-decoration: none; display: inline-flex; gap: 4px; align-items: center; }
+  details { margin-top: 8px; border-top: 1px dashed var(--line); padding-top: 6px; }
+  summary { cursor: pointer; font-size: 14px; font-weight: 500; color: var(--brand); list-style: none; display: inline-flex; align-items: center; gap: 4px; }
+  summary::-webkit-details-marker { display: none; }
+  summary::after { content: "▾"; transition: transform .15s; }
+  details[open] summary::after { transform: rotate(180deg); }
+  .details { white-space: pre-line; font-size: 15px; margin: 8px 0 0; }
+  .contact { margin-top: 8px; background: var(--surface-2); border-radius: 10px; padding: 8px 10px; font-size: 14px; white-space: pre-line; }
+  .contact b { display: block; font-size: 12px; color: var(--muted); }
+  .details a[href^="tel:"], .contact a[href^="tel:"] { color: var(--brand); font-weight: 500; white-space: nowrap; }
+  .empty { text-align: center; color: var(--muted); padding: 36px 12px; background: var(--surface); border-radius: 16px; border: 1px dashed var(--line); }
+
+  /* subscribe */
+  .subs { display: grid; gap: 10px; }
+  .subs { grid-template-columns: repeat(auto-fill, minmax(min(100%, 330px), 1fr)); }
+  .sub { --c: var(--brand); background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 12px 14px;
+    display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .sub .name { grid-column: 1 / -1; font-weight: 700; display: flex; align-items: center; gap: 8px; }
+  .sub .name .dot { width: 12px; height: 12px; border-radius: 50%; background: var(--c); }
+  .btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; text-decoration: none; font-weight: 500;
+    font-size: 14px; padding: 8px 12px; border-radius: 10px; min-height: 40px; border: 1.5px solid var(--line); background: var(--surface); }
+  .btn.primary { background: var(--brand); color: var(--brand-ink); border-color: var(--brand); }
+  .hint { font-size: 13px; color: var(--muted); margin: 10px 2px 0; }
+
+  footer { color: var(--muted); font-size: 13px; text-align: center; padding: 36px 16px 48px; }
+  .demo-flag { background: #fff3cd; color: #5c4400; font-size: 12px; padding: 2px 6px; border-radius: 6px; font-weight: 700; }
+</style>
+</head>
+<body>
+<nav class="top" aria-label="תפריט ראשי">
+  <div class="wrap">
+    <a class="brand" href="#top">נוער <span>חלח״צ</span></a>
+    <ul>
+      <li><a class="item" href="#next">האירוע הבא</a></li>
+      <li><a class="item" href="#grades">השכבות</a></li>
+      <li><a class="item" href="#events">לוח האירועים</a></li>
+      <li><a class="item" href="#subscribe">הוספה ליומן</a></li>
+    </ul>
+  </div>
+</nav>
+<header class="hero" id="top">
+  <div class="wrap">
+    <span class="eyebrow"><i></i> מתעדכן אוטומטית</span>
+    <h1>נוער <span>חלח״צ</span></h1>
+    <p>כל אירועי הנוער בחלח״צ – פעולות התנועה, טיולים, מחנות ואירועי ועדת הנוער – במקום אחד. בחרו את השכבה של הילד/ה שלכם.</p>
+    <a class="notify" href="#subscribe"><span class="bell" aria-hidden="true">🔔</span><span class="txt">"אוייש. שכחתי מזה." 🤦🤦‍♀️<br>רוצים לזכור? הוסיפו את האירועים ליומנים. ממש בקלות</span><span aria-hidden="true">←</span></a>
+  </div>
+</header>
+
+<main class="wrap">
+  <section class="next" id="next" aria-live="polite"></section>
+
+  <h2 class="section" id="grades">באיזו שכבה הילד/ה שלכם?</h2>
+  <div class="chips" id="chips" role="group" aria-label="סינון לפי שכבה"></div>
+  <div class="chips staff" id="staffChips" role="group" aria-label="אירועי צוות" hidden></div>
+  <div class="row">
+    <label class="toggle"><input type="checkbox" id="showPast"><span>הצגת אירועים שעברו</span></label>
+    <button class="linkbtn" id="staffToggle" type="button" aria-expanded="false">אירועי צוות והדרכה</button>
+  </div>
+
+  <div id="events"><div id="timeline"></div></div>
+
+  <h2 class="section" id="subscribe">קבלו את האירועים ישר ליומן בטלפון</h2>
+  <div class="subs" id="subs"></div>
+  <p class="hint">יומן Google: לחיצה אחת מוסיפה את היומן, וכל שינוי מופיע אצלכם מעצמו. באייפון: הלחצן „אייפון״ פותח הרשמה ליומן (עדכונים באייפון עשויים להתעכב כמה שעות).</p>
+</main>
+
+<footer>ועדת הנוער חלח״צ · כל אירועי הנוער ביישוב · תשפ״ז<br><span id="updated"></span></footer>
+
+<script>
+// Snapshot baked in at build time (instant first paint, and the fallback if the live fetch fails).
+let DATA = __DATA__;
+// Live events from the sheet: a read-only Apps Script endpoint that returns only the public fields.
+const ENDPOINT = "__ENDPOINT__";
+
+// calendar name -> display info (order = chip order)
+const CALS = [
+  { key: 'שכבה צעירה',     label: 'שכבה צעירה',   sub: 'ד׳–ח׳',  color: 'var(--c-young)', kids: true },
+  { key: 'שכבה בוגרת',     label: 'שכבה בוגרת',   sub: 'ט׳–י״ב', color: 'var(--c-old)',   kids: true },
+  { key: 'שכבת י״ב',       label: 'שכבת י״ב',     sub: '',        color: 'var(--c-12)',    kids: true },
+  { key: 'טקסים וטיולים', label: 'טקסים וטיולים', sub: 'לכולם',  color: 'var(--c-trips)', kids: true },
+  { key: 'רכזים',          label: 'רכזים',         sub: '',        color: 'var(--c-coord)', kids: false },
+  { key: 'שנת שירות',      label: 'שנת שירות',     sub: '',        color: 'var(--c-service)', kids: false },
+];
+const CAL = Object.fromEntries(CALS.map(c => [c.key, c]));
+const MONTHS = ['ינואר','פברואר','מרץ','אפריל','מאי','יוני','יולי','אוגוסט','ספטמבר','אוקטובר','נובמבר','דצמבר'];
+const DOW = ['א׳','ב׳','ג׳','ד׳','ה׳','ו׳','ש׳'];
+const DOW_LONG = ['ראשון','שני','שלישי','רביעי','חמישי','שישי','שבת'];
+
+const store = {
+  get(k, d) { try { const v = localStorage.getItem(k); return v === null ? d : JSON.parse(v); } catch { return d; } },
+  set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} },
+};
+
+const parse = s => { const [d, m, y] = s.split('/').map(Number); return new Date(y, m - 1, d); };
+const dayMs = 86400000;
+const today = (() => { const n = new Date(); return new Date(n.getFullYear(), n.getMonth(), n.getDate()); })();
+const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const pad = n => String(n).padStart(2, '0');
+const ymd = d => `${d.getFullYear()}${pad(d.getMonth() + 1)}${pad(d.getDate())}`;
+// escape, then turn phone numbers into tappable left-to-right links
+const withPhones = s => esc(s).replace(/(\+?\d[\d\- ]{6,}\d)/g, m => `<a dir="ltr" href="tel:${m.replace(/[^\d+]/g, '')}">${m}</a>`);
+
+let events = [];
+function loadEvents(data) {
+  events = data.movement.concat(data.committee || []).map(e => {
+    const s = parse(e.start), en = parse(e.end);
+    return { ...e, s, en, multi: en > s };
+  }).filter(e => CAL[e.cal]).sort((a, b) => a.s - b.s || a.en - b.en || a.title.localeCompare(b.title, 'he'));
+
+  // ?demo fills the next event with sample details so the expandable part can be reviewed
+  if (new URLSearchParams(location.search).has('demo')) {
+    const e = events.find(x => x.en >= today && CAL[x.cal].kids);
+    if (e) Object.assign(e, { demo: true, location: 'מועדון הנוער, חיבת ציון',
+      details: 'טקסט לדוגמה: מפגש פתיחה עם המדריכים.\nלהביא בקבוק מים וכובע.',
+      contact: 'טקסט לדוגמה: רכזת הסניף · 050-0000000' });
+  }
+}
+loadEvents(DATA);
+
+let selected = new Set(store.get('cals', ['שכבה צעירה', 'שכבה בוגרת', 'שכבת י״ב', 'טקסים וטיולים']).filter(k => CAL[k]));
+let showPast = store.get('past', false);
+let staffOpen = selected.has('רכזים') || selected.has('שנת שירות');
+
+function chip(c) {
+  const b = document.createElement('button');
+  b.type = 'button'; b.className = 'chip'; b.style.setProperty('--c', c.color);
+  b.setAttribute('aria-pressed', selected.has(c.key));
+  b.innerHTML = `<span class="dot"></span>${esc(c.label)}${c.sub ? ` <small>${esc(c.sub)}</small>` : ''}`;
+  b.onclick = () => {
+    selected.has(c.key) ? selected.delete(c.key) : selected.add(c.key);
+    b.setAttribute('aria-pressed', selected.has(c.key));
+    store.set('cals', [...selected]); render();
+  };
+  return b;
+}
+
+function whenText(e) {
+  if (e.multi) {
+    const same = e.s.getMonth() === e.en.getMonth();
+    return `${DOW_LONG[e.s.getDay()]} ${e.s.getDate()}${same ? '' : '.' + (e.s.getMonth() + 1)} – ${DOW_LONG[e.en.getDay()]} ${e.en.getDate()}.${e.en.getMonth() + 1} · ${Math.round((e.en - e.s) / dayMs) + 1} ימים`;
+  }
+  return `יום ${DOW_LONG[e.s.getDay()]} · ${e.full ? 'כל היום' : `\u2066${e.from}–${e.to}\u2069`}`;
+}
+
+function gcalLink(e) {
+  const p = new URLSearchParams({ action: 'TEMPLATE', text: e.title, ctz: 'Asia/Jerusalem' });
+  if (e.full || e.multi) p.set('dates', `${ymd(e.s)}/${ymd(new Date(e.en.getTime() + dayMs))}`);
+  else p.set('dates', `${ymd(e.s)}T${e.from.replace(':', '')}00/${ymd(e.s)}T${e.to.replace(':', '')}00`);
+  if (e.location) p.set('location', e.location);
+  const desc = [e.details, e.contact && 'פרטי איש קשר:\n' + e.contact].filter(Boolean).join('\n\n');
+  if (desc) p.set('details', desc);
+  return 'https://calendar.google.com/calendar/render?' + p;
+}
+
+const ICON_CLOCK = '<svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>';
+const ICON_PIN = '<svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 21s-7-6.2-7-11a7 7 0 1 1 14 0c0 4.8-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/></svg>';
+
+function card(e) {
+  const c = CAL[e.cal];
+  const past = e.en < today, isToday = e.s <= today && e.en >= today;
+  const el = document.createElement('article');
+  el.className = 'card' + (past ? ' past' : '') + (isToday ? ' today' : '');
+  el.style.setProperty('--c', c.color);
+  const more = e.details || e.contact;
+  el.innerHTML = `
+    <div class="date" aria-hidden="true"><span class="dow">${DOW[e.s.getDay()]}</span><span class="d">${e.s.getDate()}</span><span class="m">${MONTHS[e.s.getMonth()]}</span></div>
+    <div class="body">
+      <span class="tag">${esc(c.label)}</span>${e.demo ? ' <span class="demo-flag">דוגמה</span>' : ''}
+      <h4>${esc(e.title)}</h4>
+      <div class="when">${ICON_CLOCK}<span>${esc(whenText(e))}</span></div>
+      ${e.location ? `<div class="where">${ICON_PIN}<a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(e.location)}" target="_blank" rel="noopener">${esc(e.location)}</a></div>` : ''}
+      ${more ? `<details><summary>פרטים</summary>${e.details ? `<p class="details">${withPhones(e.details)}</p>` : ''}${e.contact ? `<div class="contact"><b>איש קשר</b>${withPhones(e.contact)}</div>` : ''}</details>` : ''}
+      ${past ? '' : `<div class="actions"><a href="${gcalLink(e)}" target="_blank" rel="noopener">＋ הוספה ליומן שלי</a></div>`}
+    </div>`;
+  return el;
+}
+
+function renderNext(list) {
+  const box = document.getElementById('next');
+  const nxt = list.find(e => e.en >= today);
+  if (!nxt) { box.innerHTML = '<div class="count"><b>🎉</b></div><div><div class="title">אין אירועים קרובים בשכבות שנבחרו</div></div>'; return; }
+  const days = Math.round((nxt.s - today) / dayMs);
+  const [num, word] = nxt.s <= today ? ['היום', ''] : days === 1 ? ['מחר', ''] : [days, 'ימים'];
+  box.style.setProperty('--c', CAL[nxt.cal].color);
+  box.innerHTML = `
+    <div class="count"><small>${typeof num === 'number' ? 'בעוד' : ''}</small><b>${num}</b><small>${word}</small></div>
+    <div><div class="label">האירוע הבא · ${esc(CAL[nxt.cal].label)}</div>
+      <div class="title">${esc(nxt.title)}</div>
+      <div class="meta">${nxt.s.getDate()} ב${MONTHS[nxt.s.getMonth()]} · ${esc(whenText(nxt))}</div></div>`;
+}
+
+function render() {
+  const list = events.filter(e => selected.has(e.cal));
+  renderNext(list);
+  const shown = list.filter(e => showPast || e.en >= today);
+  const tl = document.getElementById('timeline');
+  tl.innerHTML = '';
+  if (!selected.size) { tl.innerHTML = '<p class="empty">בחרו לפחות שכבה אחת כדי לראות אירועים.</p>'; return; }
+  if (!shown.length) { tl.innerHTML = '<p class="empty">אין אירועים להצגה.</p>'; return; }
+  let key = '', listEl;
+  for (const e of shown) {
+    const k = e.s.getFullYear() + '-' + e.s.getMonth();
+    if (k !== key) {
+      key = k;
+      const n = shown.filter(x => x.s.getFullYear() + '-' + x.s.getMonth() === k).length;
+      const h = document.createElement('div'); h.className = 'month';
+      h.innerHTML = `<h3>${MONTHS[e.s.getMonth()]} ${e.s.getFullYear()}</h3><span>${n} אירועים</span>`;
+      listEl = document.createElement('div'); listEl.className = 'list';
+      tl.append(h, listEl);
+    }
+    listEl.append(card(e));
+  }
+}
+
+function renderSubs() {
+  const box = document.getElementById('subs');
+  box.innerHTML = '';
+  for (const c of CALS) {
+    const id = DATA.calendars[c.key];
+    if (!id) continue;
+    const q = encodeURIComponent(id);
+    const el = document.createElement('div');
+    el.className = 'sub'; el.style.setProperty('--c', c.color);
+    el.innerHTML = `<div class="name"><span class="dot"></span>${esc(c.label)}</div>
+      <a class="btn primary" href="https://calendar.google.com/calendar/u/0?cid=${btoa(id).replace(/=+$/, '')}" target="_blank" rel="noopener">יומן Google</a>
+      <a class="btn" href="webcal://calendar.google.com/calendar/ical/${q}/public/basic.ics">אייפון</a>`;
+    box.append(el);
+  }
+}
+
+const chips = document.getElementById('chips'), staffChips = document.getElementById('staffChips');
+CALS.filter(c => c.kids).forEach(c => chips.append(chip(c)));
+CALS.filter(c => !c.kids).forEach(c => staffChips.append(chip(c)));
+const staffToggle = document.getElementById('staffToggle');
+const setStaff = open => { staffOpen = open; staffChips.hidden = !open; staffToggle.setAttribute('aria-expanded', open);
+  staffToggle.textContent = open ? 'הסתרת אירועי צוות' : 'אירועי צוות והדרכה'; };
+staffToggle.onclick = () => setStaff(!staffOpen);
+setStaff(staffOpen);
+const pastBox = document.getElementById('showPast');
+pastBox.checked = showPast;
+pastBox.onchange = () => { showPast = pastBox.checked; store.set('past', showPast); render(); };
+function showUpdated(iso) {
+  const d = new Date(iso);
+  document.getElementById('updated').textContent = 'עודכן לאחרונה: ' +
+    d.toLocaleString('he-IL', { day: 'numeric', month: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Jerusalem' });
+}
+document.documentElement.dataset.source = 'snapshot';
+showUpdated(DATA.generatedAt);
+renderSubs();
+render();
+
+// Refresh from the sheet; on any failure the snapshot simply stays on screen.
+fetch(ENDPOINT, { cache: 'no-store' })
+  .then(r => r.ok ? r.json() : Promise.reject(r.status))
+  .then(live => {
+    if (!Array.isArray(live.movement)) return;
+    DATA = live;
+    document.documentElement.dataset.source = 'live'; // 'snapshot' until the sheet answers
+    loadEvents(live);
+    showUpdated(live.generatedAt);
+    renderSubs();
+    render();
+    markActive();
+  })
+  .catch(() => {});
+
+// highlight the menu item for the section currently on screen
+const items = [...document.querySelectorAll('nav.top a.item')];
+const sections = items.map(a => document.getElementById(a.getAttribute('href').slice(1)));
+function markActive() {
+  const line = document.querySelector('nav.top').offsetHeight + 24;
+  let current = null;
+  for (const s of sections) if (s.getBoundingClientRect().top <= line) current = s;
+  if (innerHeight + scrollY >= document.documentElement.scrollHeight - 4) current = sections[sections.length - 1];
+  items.forEach((a, i) => a.setAttribute('aria-current', sections[i] === current));
+}
+addEventListener('scroll', markActive, { passive: true });
+markActive();
+</script>
+</body>
+</html>
