@@ -5,7 +5,7 @@
 
 const GITHUB_REPO = 'halhats-dev/noar-halhats';
 const GITHUB_WORKFLOW = 'pages.yml';
-const REBUILD_MIN_GAP_MS = 10 * 60 * 1000; // at most one rebuild request per 10 minutes
+const REBUILD_MIN_GAP_MS = 10 * 60 * 1000; // at most one rebuild per 10 minutes; a later one waits, never drops
 
 // Run once from the editor, after adding the GITHUB_TOKEN script property:
 // installs the weekly rebuild and sends one test request.
@@ -18,6 +18,13 @@ function setupGithubRebuild() {
   Logger.log(status === 204 ? 'OK – GitHub accepted the rebuild request (204).' : 'Problem – GitHub answered: ' + status);
 }
 
+function deferredSiteRebuild() {
+  ScriptApp.getProjectTriggers()
+    .filter(t => t.getHandlerFunction() === 'deferredSiteRebuild')
+    .forEach(t => ScriptApp.deleteTrigger(t));
+  requestSiteRebuild(true);
+}
+
 function weeklySiteRebuild() {
   requestSiteRebuild(true);
 }
@@ -28,7 +35,13 @@ function requestSiteRebuild(force) {
   const token = props.getProperty('GITHUB_TOKEN');
   if (!token) return 'no GITHUB_TOKEN';
   const last = JSON.parse(props.getProperty('lastRebuild') || '{}');
-  if (!force && last.at && Date.now() - new Date(last.at).getTime() < REBUILD_MIN_GAP_MS) return 'skipped (recent)';
+  const sinceLast = last.at ? Date.now() - new Date(last.at).getTime() : Infinity;
+  if (!force && sinceLast < REBUILD_MIN_GAP_MS) {
+    // Too soon after the previous rebuild: run it once the gap is over instead of dropping it.
+    const pending = ScriptApp.getProjectTriggers().some(t => t.getHandlerFunction() === 'deferredSiteRebuild');
+    if (!pending) ScriptApp.newTrigger('deferredSiteRebuild').timeBased().after(REBUILD_MIN_GAP_MS - sinceLast + 5000).create();
+    return 'deferred';
+  }
   const res = UrlFetchApp.fetch(
     `https://api.github.com/repos/${GITHUB_REPO}/actions/workflows/${GITHUB_WORKFLOW}/dispatches`, {
       method: 'post',
