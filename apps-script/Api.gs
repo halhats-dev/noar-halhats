@@ -9,7 +9,13 @@ function doGet() {
   const cache = CacheService.getScriptCache();
   let body = cache.get('events');
   if (!body) {
-    body = JSON.stringify(apiPayload_());
+    try {
+      body = JSON.stringify(apiPayload_());
+    } catch (err) {
+      // the page keeps its saved copy (and says so) when this has no event lists
+      return ContentService.createTextOutput(JSON.stringify({ error: String(err.message || err) }))
+        .setMimeType(ContentService.MimeType.JSON);
+    }
     try { cache.put('events', body, API_CACHE_SECONDS); } catch (e) {} // over the 100KB cache limit: just skip caching
   }
   return ContentService.createTextOutput(body).setMimeType(ContentService.MimeType.JSON);
@@ -20,10 +26,11 @@ function apiPayload_() {
   Object.keys(CALENDARS).forEach(name => { out.calendars[name.replace(API_PREFIX, '')] = CALENDARS[name]; });
   Object.keys(API_TABS).forEach(key => {
     const sh = SpreadsheetApp.getActive().getSheetByName(API_TABS[key]);
+    if (!layoutOk_(sh)) throw new Error('column layout changed');
     const last = sh.getLastRow();
     const rows = last < 2 ? [] : sh.getRange(2, 1, last - 1, COL.contact).getValues();
     out[key] = rows
-      .filter(r => r[COL.start - 1] instanceof Date && String(r[COL.title - 1]).trim() && r[COL.category - 1])
+      .filter(r => r[COL.happening - 1] === true && r[COL.start - 1] instanceof Date && String(r[COL.title - 1]).trim() && r[COL.category - 1])
       .map(r => ({
         start: fmt_(r[COL.start - 1]),
         end: fmt_(r[COL.end - 1] instanceof Date ? r[COL.end - 1] : r[COL.start - 1]),

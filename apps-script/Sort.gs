@@ -3,7 +3,7 @@
 
 const SORT_TABS = ['אירועי תנועה - איחוד חקלאי', 'אירועי ועדה']; // literal: files may load before Sync.gs
 const SORT_DELAY_MS = 3 * 60 * 1000;
-const SORT_LAST_COL = 15; // A:O, so hidden IDs and all event details move with their row
+const SORT_LAST_COL = 16; // A:P, so hidden IDs and all event details move with their row
 
 // Called on every change: remember when it happened and make sure a sort is pending.
 function scheduleSort_() {
@@ -35,10 +35,13 @@ function sortNow() {
   }
   // A change made while we held the lock may have skipped its sync.
   if (PropertiesService.getScriptProperties().getProperty('dirty')) syncCalendars();
+  // Edits have settled: refresh the website's saved snapshot too.
+  try { requestSiteRebuild(false); } catch (e) { console.warn('site rebuild request failed: ' + e); }
 }
 
 function sortTab_(name) {
   const sh = SpreadsheetApp.getActive().getSheetByName(name);
+  if (!layoutOk_(sh)) return;
   const n = sh.getMaxRows() - 1;
   if (n < 2) return;
   sh.getRange(2, 1, n, SORT_LAST_COL).sort([
@@ -51,6 +54,6 @@ function sortTab_(name) {
     .setAllowInvalid(false).setHelpText(BLOCK_HELP).build();
   const list = SpreadsheetApp.newDataValidation().requireValueInList(TIMES, true)
     .setAllowInvalid(false).build();
-  const full = sh.getRange(2, 8, n, 1).getValues();
-  sh.getRange(2, 9, n, 2).setDataValidations(full.map(([f]) => f === true ? [block, block] : [list, list]));
+  const full = sh.getRange(2, C_FULL, n, 1).getValues();
+  sh.getRange(2, C_FROM, n, 2).setDataValidations(full.map(([f]) => f === true ? [block, block] : [list, list]));
 }

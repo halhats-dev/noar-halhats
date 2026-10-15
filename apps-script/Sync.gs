@@ -14,7 +14,7 @@ const CALENDARS = {
 const TAG = 'sheetRowId';
 const SYNC_FROM = new Date(2026, 0, 1);
 const SYNC_TO = new Date(2029, 0, 1);
-const COL = { start: 2, end: 3, title: 6, category: 7, fullDay: 8, from: 9, to: 10, id: 11, fp: 12, location: 13, details: 14, contact: 15 };
+const COL = { start: 2, end: 3, title: 6, category: 7, happening: 8, fullDay: 9, from: 10, to: 11, id: 12, fp: 13, location: 14, details: 15, contact: 16 };
 
 // Run once from the editor: installs the triggers and does the first full sync.
 function setup() {
@@ -59,6 +59,7 @@ function syncCalendars() {
 function syncOnce_() {
   const sh = SpreadsheetApp.getActive().getSheetByName(SYNC_TAB);
   const last = sh.getLastRow();
+  if (!layoutOk_(sh)) return;
   const rows = last < 2 ? [] : sh.getRange(2, 1, last - 1, COL.contact).getValues();
 
   // Index every event this script created, by row ID.
@@ -105,12 +106,13 @@ function syncOnce_() {
   if (idsAndFps.length) sh.getRange(2, COL.id, idsAndFps.length, 2).setValues(idsAndFps);
 }
 
-// Returns the event to write for a row, null when the row is incomplete,
+// Returns the event to write for a row, null when the row is incomplete or not happening,
 // or false when the times are invalid.
 function eventSpec_(r) {
   const start = r[COL.start - 1], title = String(r[COL.title - 1]).trim();
   const category = r[COL.category - 1];
   if (!(start instanceof Date) || !title || !CALENDARS[category]) return null;
+  if (r[COL.happening - 1] !== true) return null; // unticked "מתקיים": no calendar event
   const endDay = r[COL.end - 1] instanceof Date ? r[COL.end - 1] : start;
   const allDay = r[COL.fullDay - 1] === true;
   const location = String(r[COL.location - 1]).trim();

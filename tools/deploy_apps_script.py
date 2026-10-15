@@ -1,5 +1,7 @@
 """Pushes apps-script/*.gs + appsscript.json to the sheet-bound project and (re)deploys the public web app.
 
+With --code-only, only pushes the code (the web app keeps serving its current version).
+
 Runs as the halhats Google account (tools/gauth.py). The web app URL is stable across redeploys; it is kept
 in apps-script/deployment.json.
 """
@@ -18,12 +20,15 @@ STATE = SRC / 'deployment.json'
 api = build('script', 'v1', credentials=creds()).projects()
 files = [{'name': 'appsscript', 'type': 'JSON', 'source': (SRC / 'appsscript.json').read_text()}]
 # Load order matters in Apps Script: top-level constants must be defined before files that use them.
-ORDER = ['Code', 'Sync', 'Sort', 'Api']
+ORDER = ['Code', 'Sync', 'Sort', 'Api']  # add 'Rebuild' when apps-script/pending/Rebuild.gs goes live
 gs = {f.stem: f for f in SRC.glob('*.gs')}
 assert set(gs) == set(ORDER), f'update ORDER: {sorted(gs)}'
 files += [{'name': n, 'type': 'SERVER_JS', 'source': gs[n].read_text()} for n in ORDER]
 api.updateContent(scriptId=SCRIPT_ID, body={'files': files}).execute()
 print('pushed:', [f['name'] for f in files])
+
+if '--code-only' in sys.argv:
+    sys.exit(0)  # triggers run the pushed code; the public web app keeps its deployed version
 
 version = api.versions().create(scriptId=SCRIPT_ID, body={'description': 'web app'}).execute()['versionNumber']
 config = {'versionNumber': version, 'manifestFileName': 'appsscript', 'description': 'parents page endpoint'}
