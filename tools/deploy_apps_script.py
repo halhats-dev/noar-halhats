@@ -20,7 +20,7 @@ STATE = SRC / 'deployment.json'
 api = build('script', 'v1', credentials=creds()).projects()
 files = [{'name': 'appsscript', 'type': 'JSON', 'source': (SRC / 'appsscript.json').read_text()}]
 # Load order matters in Apps Script: top-level constants must be defined before files that use them.
-ORDER = ['Code', 'Sync', 'Sort', 'Api']  # add 'Rebuild' when apps-script/pending/Rebuild.gs goes live
+ORDER = ['Code', 'Sync', 'Sort', 'Api', 'Rebuild']
 gs = {f.stem: f for f in SRC.glob('*.gs')}
 assert set(gs) == set(ORDER), f'update ORDER: {sorted(gs)}'
 files += [{'name': n, 'type': 'SERVER_JS', 'source': gs[n].read_text()} for n in ORDER]
