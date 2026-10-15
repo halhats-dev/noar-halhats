@@ -138,6 +138,9 @@
   .next .label { font-size: 13px; color: var(--muted); font-weight: 500; }
   .next .title { font-size: 19px; font-weight: 700; margin: 2px 0; line-height: 1.25; }
   .next .meta { font-size: 14px; color: var(--muted); }
+  .nextlist { list-style: none; margin: 4px 0 0; padding: 0; display: grid; gap: 8px; }
+  .nextlist li { border-inline-start: 3px solid var(--c); padding-inline-start: 10px; }
+  .nextlist .title { font-size: 17px; }
 
   /* section titles */
   h2.section { font-size: 15px; font-weight: 700; color: var(--muted); margin: 28px 0 10px; letter-spacing: .2px; }
@@ -389,14 +392,25 @@ function renderNext(list) {
   const box = document.getElementById('next');
   const nxt = list.find(e => e.en >= today);
   if (!nxt) { box.innerHTML = '<div class="count"><b>🎉</b></div><div><div class="title">אין אירועים קרובים בשכבות שנבחרו</div></div>'; return; }
-  const days = Math.round((nxt.s - today) / dayMs);
-  const [num, word] = nxt.s <= today ? ['היום', ''] : days === 1 ? ['מחר', ''] : [days, 'ימים'];
+  // The next day with events (today, if something is already under way) and everything on it.
+  const day = nxt.s <= today ? today : nxt.s;
+  const onDay = list.filter(e => e.s <= day && day <= e.en);
+  const days = Math.round((day - today) / dayMs);
+  const [num, word] = days <= 0 ? ['היום', ''] : days === 1 ? ['מחר', ''] : [days, 'ימים'];
   box.style.setProperty('--c', CAL[nxt.cal].color);
-  box.innerHTML = `
-    <div class="count"><small>${typeof num === 'number' ? 'בעוד' : ''}</small><b>${num}</b><small>${word}</small></div>
-    <div><div class="label">האירוע הבא · ${esc(CAL[nxt.cal].label)}</div>
-      <div class="title">${esc(nxt.title)}</div>
-      <div class="meta">${nxt.s.getDate()} ב${MONTHS[nxt.s.getMonth()]} · ${esc(whenText(nxt))}</div></div>`;
+  const count = `<div class="count"><small>${typeof num === 'number' ? 'בעוד' : ''}</small><b>${num}</b><small>${word}</small></div>`;
+  if (onDay.length === 1) {
+    box.innerHTML = `${count}
+      <div><div class="label">האירוע הבא · ${esc(CAL[nxt.cal].label)}</div>
+        <div class="title">${esc(nxt.title)}</div>
+        <div class="meta">${nxt.s.getDate()} ב${MONTHS[nxt.s.getMonth()]} · ${esc(whenText(nxt))}</div></div>`;
+    return;
+  }
+  box.innerHTML = `${count}
+    <div><div class="label">האירועים הבאים · יום ${DOW_LONG[day.getDay()]}, ${day.getDate()} ב${MONTHS[day.getMonth()]}</div>
+      <ul class="nextlist">${onDay.map(e => `<li style="--c:${CAL[e.cal].color}">
+        <div class="title">${esc(e.title)}</div>
+        <div class="meta">${esc(CAL[e.cal].label)} · ${esc(e.full || e.multi ? whenText(e) : `⁦${e.from}–${e.to}⁩`)}</div></li>`).join('')}</ul></div>`;
 }
 
 // Month keys are 'YYYY-M'; months the reader opened stay open across re-renders (filters, live refresh).
