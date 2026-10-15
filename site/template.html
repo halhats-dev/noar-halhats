@@ -85,7 +85,8 @@
     nav.top a.item { font-size: 14px; padding: 0 9px; }
   }
   @media (max-width: 380px) { nav.top a.item { font-size: 13.5px; padding: 0 6px; } }
-  #next, #grades, #events, #subscribe { scroll-margin-top: calc(var(--nav-h) + 16px); }
+  #next, #grades { scroll-margin-top: calc(var(--nav-h) + 16px); }
+  #events, #subscribe { scroll-margin-top: calc(var(--nav-h) + var(--filter-h, 0px) + 16px); }
   html { scroll-behavior: smooth; }
   @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
 
@@ -145,25 +146,43 @@
   /* section titles */
   h2.section { font-size: 15px; font-weight: 700; color: var(--muted); margin: 28px 0 10px; letter-spacing: .2px; }
 
-  /* filter chips */
-  .chips { display: flex; flex-wrap: wrap; gap: 8px; }
+  /* filter chips: four compact tiles in one row, sticky under the menu while scrolling the months */
+  .filterbar { position: sticky; top: var(--nav-h); z-index: 3; background: var(--bg); margin: 0 -16px; padding: 8px 16px;
+    box-shadow: 0 8px 10px -10px rgba(0, 0, 0, .25); }
+  .chips { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; }
   .chip { --c: var(--brand); appearance: none; border: 1.5px solid var(--line); background: var(--surface); color: var(--text);
-    font: inherit; font-size: 15px; font-weight: 500; padding: 8px 14px 8px 12px; border-radius: 99px; cursor: pointer;
-    display: inline-flex; align-items: center; gap: 8px; min-height: 40px; transition: background .15s, border-color .15s; }
-  .chip .dot { width: 10px; height: 10px; border-radius: 50%; background: var(--c); flex: none; }
-  .chip small { color: var(--muted); font-weight: 400; font-size: 13px; }
-  .chip[aria-pressed="true"] { border-color: var(--c); background: color-mix(in srgb, var(--c) 12%, var(--surface)); }
-  .chip[aria-pressed="true"]::after { content: "✓"; font-size: 13px; color: var(--c); font-weight: 700; }
+    font: inherit; font-size: 13px; font-weight: 600; padding: 5px 6px; border-radius: 10px; cursor: pointer; width: 100%; min-width: 0;
+    display: flex; align-items: center; justify-content: center; gap: 5px; min-height: 44px; text-align: center;
+    color: var(--muted); box-shadow: 0 1px 2px rgba(0, 0, 0, .08), 0 2px 4px rgba(0, 0, 0, .06);
+    transition: background .2s, border-color .2s, color .2s, box-shadow .15s, transform .1s; }
+  /* state icon: + to add, ✓ when on */
+  .chip::before { content: "+"; flex: none; font-size: 15px; font-weight: 800; line-height: 1; }
+  .chip[aria-pressed="true"]::before { content: "✓"; font-size: 13px; }
+  .chip:active { transform: scale(.95); box-shadow: 0 0 1px rgba(0, 0, 0, .2); }
+  @media (hover: hover) { .chip:not([aria-pressed="true"]):hover { border-color: var(--c); color: var(--text); } }
+  @media (prefers-reduced-motion: reduce) { .chip { transition: none; } .chip:active { transform: none; } }
+  .chip .dot { display: none; } /* the ✓ / + icon and the fill colour carry the state */
+  .chip .txt { display: flex; flex-direction: column; min-width: 0; line-height: 1.15; }
+  .chip .txt span { overflow-wrap: anywhere; }
+  .chip small { color: var(--muted); font-weight: 400; font-size: 11px; margin-top: 1px; }
+  .chip[aria-pressed="true"] { background: var(--c); border-color: var(--c); color: #fff;
+    box-shadow: 0 2px 6px color-mix(in srgb, var(--c) 45%, transparent); }
+  .chip[aria-pressed="true"] small { color: rgba(255, 255, 255, .85); }
   .chip:focus-visible, .btn:focus-visible, summary:focus-visible, .toggle input:focus-visible + span { outline: 3px solid var(--sun); outline-offset: 2px; }
-  .chips.staff { margin-top: 8px; }
-  .chips.staff .chip { font-size: 14px; min-height: 36px; padding: 6px 12px 6px 10px; }
+  .chips.staff { margin-top: 8px; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  @media (max-width: 599px) {
+    .chip { min-height: 40px; padding: 4px; font-size: 13px; }
+    #chips .chip small { display: none; }
+  }
+  @media (max-width: 360px) { .chip { font-size: 12px; } }
+  @media (min-width: 600px) { .chip { font-size: 14px; } .chips.staff { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
   .row { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-top: 14px; flex-wrap: wrap; }
   .toggle { display: inline-flex; align-items: center; gap: 8px; font-size: 14px; color: var(--muted); cursor: pointer; }
   .toggle input { width: 18px; height: 18px; accent-color: var(--brand); }
   .linkbtn { background: none; border: 0; font: inherit; font-size: 14px; color: var(--brand); text-decoration: underline; cursor: pointer; padding: 4px; }
 
   /* timeline */
-  .month { position: sticky; top: var(--nav-h); z-index: 2; background: var(--bg); padding: 14px 0 8px; margin-top: 8px;
+  .month { position: sticky; top: calc(var(--nav-h) + var(--filter-h, 0px)); z-index: 2; background: var(--bg); padding: 14px 0 8px; margin-top: 8px;
     display: flex; align-items: baseline; gap: 8px; }
   .month h3 { margin: 0; font-size: 20px; font-weight: 800; }
   .month span { color: var(--muted); font-size: 14px; }
@@ -236,6 +255,17 @@
   .btn.primary { background: var(--brand); color: var(--brand-ink); border-color: var(--brand); }
   .hint { font-size: 13px; color: var(--muted); margin: 10px 2px 0; }
 
+  /* suggestion to also add טקסים וטיולים */
+  .dlg { border: 0; border-radius: 18px; padding: 20px; max-width: min(360px, calc(100vw - 32px)); background: var(--surface); color: var(--text);
+    box-shadow: 0 20px 50px rgba(0, 0, 0, .3); }
+  .dlg::backdrop { background: rgba(10, 20, 14, .45); }
+  .dlg h3 { margin: 0 0 8px; font-size: 18px; }
+  .dlg p { margin: 0 0 16px; font-size: 15px; color: var(--muted); line-height: 1.5; }
+  .dlgbtns { display: flex; gap: 8px; }
+  .dlgbtns .btn { flex: 1 1 auto; cursor: pointer; font: inherit; font-size: 15px; font-weight: 600; color: var(--text); text-align: center; white-space: nowrap; }
+  .dlgbtns .btn.primary { flex-grow: 2; }
+  .dlgbtns .btn.primary { color: var(--brand-ink); }
+
   footer { color: var(--muted); font-size: 13px; text-align: center; padding: 36px 16px 48px; }
   .demo-flag { background: #fff3cd; color: #5c4400; font-size: 12px; padding: 2px 6px; border-radius: 6px; font-weight: 700; }
 </style>
@@ -266,7 +296,7 @@
   <p class="stale" id="stale" role="status" hidden></p>
 
   <h2 class="section" id="grades">באיזו שכבה הילד/ה שלכם?</h2>
-  <div class="chips" id="chips" role="group" aria-label="סינון לפי שכבה"></div>
+  <div class="filterbar" id="filterbar"><div class="chips" id="chips" role="group" aria-label="סינון לפי שכבה"></div></div>
   <div class="chips staff" id="staffChips" role="group" aria-label="אירועי צוות" hidden></div>
   <div class="row">
     <label class="toggle"><input type="checkbox" id="showPast"><span>הצגת אירועים שעברו</span></label>
@@ -277,6 +307,14 @@
 
   <h2 class="section" id="subscribe">קבלו את האירועים ישר ליומן בטלפון</h2>
   <div class="subs" id="subs"></div>
+  <dialog class="dlg" id="tripsDlg" aria-labelledby="tripsTitle">
+    <h3 id="tripsTitle">להוסיף גם את „טקסים וטיולים״?</h3>
+    <p>ביומן הזה נמצאים האירועים של כל השכבות – טקסים, טיולי פתי״ש ועוד. מומלץ להוסיף גם אותו, כדי לא לפספס.</p>
+    <div class="dlgbtns">
+      <a class="btn primary" id="tripsAdd" href="#">הוספה</a>
+      <button class="btn" id="tripsNo" type="button">לא עכשיו</button>
+    </div>
+  </dialog>
   <p class="hint">יומן Google: לחיצה אחת מוסיפה את היומן, וכל שינוי מופיע אצלכם מעצמו. באייפון: הלחצן „אייפון״ פותח הרשמה ליומן (עדכונים באייפון עשויים להתעכב כמה שעות).</p>
 </main>
 
@@ -342,8 +380,9 @@ let staffOpen = selected.has('רכזים') || selected.has('שנת שירות');
 function chip(c) {
   const b = document.createElement('button');
   b.type = 'button'; b.className = 'chip'; b.style.setProperty('--c', c.color);
+  if (c.sub) b.title = `${c.label} · ${c.sub}`;
   b.setAttribute('aria-pressed', selected.has(c.key));
-  b.innerHTML = `<span class="dot"></span>${esc(c.label)}${c.sub ? ` <small>${esc(c.sub)}</small>` : ''}`;
+  b.innerHTML = `<span class="dot"></span><span class="txt"><span>${esc(c.label)}</span>${c.sub ? `<small>${esc(c.sub)}</small>` : ''}</span>`;
   b.onclick = () => {
     selected.has(c.key) ? selected.delete(c.key) : selected.add(c.key);
     b.setAttribute('aria-pressed', selected.has(c.key));
@@ -455,11 +494,13 @@ function render() {
 
   for (const [k, evs] of groups) {
     if (k === focus) {
+      const sec = document.createElement('section');   // keeps the sticky heading inside this month
       const h = document.createElement('div'); h.className = 'month';
       h.innerHTML = monthHeader(evs[0], evs.length);
       const listEl = document.createElement('div'); listEl.className = 'list';
       evs.forEach(e => listEl.append(card(e)));
-      tl.append(h, listEl);
+      sec.append(h, listEl);
+      tl.append(sec);
       continue;
     }
     // Other months: one compact card with a short preview; full cards are built when opened.
@@ -483,20 +524,48 @@ function render() {
   }
 }
 
+const TRIPS = 'טקסים וטיולים';
+// add-calendar links for one calendar: Google (web) and iPhone (webcal subscription)
+function subLinks(id) {
+  return {
+    google: `https://calendar.google.com/calendar/u/0?cid=${btoa(id).replace(/=+$/, '')}`,
+    iphone: `webcal://calendar.google.com/calendar/ical/${encodeURIComponent(id)}/public/basic.ics`,
+  };
+}
+
 function renderSubs() {
   const box = document.getElementById('subs');
   box.innerHTML = '';
   for (const c of CALS) {
     const id = DATA.calendars[c.key];
     if (!id) continue;
-    const q = encodeURIComponent(id);
+    const links = subLinks(id);
     const el = document.createElement('div');
     el.className = 'sub'; el.style.setProperty('--c', c.color);
     el.innerHTML = `<div class="name"><span class="dot"></span>${esc(c.label)}</div>
-      <a class="btn primary" href="https://calendar.google.com/calendar/u/0?cid=${btoa(id).replace(/=+$/, '')}" target="_blank" rel="noopener">יומן Google</a>
-      <a class="btn" href="webcal://calendar.google.com/calendar/ical/${q}/public/basic.ics">אייפון</a>`;
+      <a class="btn primary" data-kind="google" href="${links.google}" target="_blank" rel="noopener">יומן Google</a>
+      <a class="btn" data-kind="iphone" href="${links.iphone}">אייפון</a>`;
+    el.querySelectorAll('a[data-kind]').forEach(a => a.addEventListener('click', () => {
+      if (c.key === TRIPS) store.set('tripsAdded:' + a.dataset.kind, true);
+      else suggestTrips(a.dataset.kind);
+    }));
     box.append(el);
   }
+}
+
+// After adding any other calendar, suggest טקסים וטיולים too (once it was added on this platform, stay quiet).
+function suggestTrips(kind) {
+  const id = DATA.calendars[TRIPS];
+  const dlg = document.getElementById('tripsDlg');
+  if (!id || store.get('tripsAdded:' + kind, false) || !dlg.showModal) return;
+  const add = document.getElementById('tripsAdd');
+  add.href = subLinks(id)[kind];
+  add.textContent = kind === 'google' ? 'הוספה ליומן Google' : 'הוספה לאייפון';
+  if (kind === 'google') { add.target = '_blank'; add.rel = 'noopener'; } else { add.removeAttribute('target'); add.removeAttribute('rel'); }
+  add.onclick = () => { store.set('tripsAdded:' + kind, true); dlg.close(); };
+  document.getElementById('tripsNo').onclick = () => dlg.close();
+  // let the calendar app / tab open first, then show the suggestion on the page
+  setTimeout(() => { if (!dlg.open) dlg.showModal(); }, 600);
 }
 
 const chips = document.getElementById('chips'), staffChips = document.getElementById('staffChips');
@@ -515,6 +584,10 @@ function showUpdated(iso) {
   document.getElementById('updated').textContent = 'עודכן לאחרונה: ' +
     d.toLocaleString('he-IL', { day: 'numeric', month: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Jerusalem' });
 }
+const filterbar = document.getElementById('filterbar');
+const setFilterH = () => document.documentElement.style.setProperty('--filter-h', filterbar.offsetHeight + 'px');
+new ResizeObserver(setFilterH).observe(filterbar);
+setFilterH();
 document.documentElement.dataset.source = 'snapshot';
 showUpdated(DATA.generatedAt);
 renderSubs();
