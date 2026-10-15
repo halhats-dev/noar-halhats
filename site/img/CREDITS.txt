@@ -1,3 +1,5 @@
 hero.jpg — "Hiking Hikers" from stocksnap, license CC0 (public domain dedication, no attribution required).
 Source page: https://stocksnap.io/photo/hiking-hikers-A150E71AFE
 Original file: https://cdn.stocksnap.io/img-thumbs/960w/A150E71AFE.jpg
+
+logo-ihud.png — logo of תנועת הנוער של האיחוד החקלאי, extracted (with its transparency mask) from the movement's own annual plan PDF "תוכנית שנתית האיחוד החקלאי תשפז- 2026-2027.pdf". Marks the movement's events on the page.
