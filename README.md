@@ -1,7 +1,7 @@
 # נוער חלח״צ — youth events: sheet → calendars → website
 
 The events of the youth in חלח״צ for the year, kept in **one Google Sheet** and published automatically to
-**six public Google Calendars** and a **parents' website**:
+**five public Google Calendars** and a **parents' website**:
 
 **https://halhats-dev.github.io/noar-halhats/**
 
@@ -15,7 +15,7 @@ seconds (calendars) to about a minute (website).
 ```mermaid
 flowchart LR
   E([Editors]) -->|edit| S[(Google Sheet<br/>annual plan)]
-  S -->|onChange trigger<br/>Sync.gs| C[6 public<br/>Google Calendars]
+  S -->|onChange trigger<br/>Sync.gs| C[5 public<br/>Google Calendars]
   S -->|read on request<br/>Api.gs web app| A{{Public JSON endpoint}}
   A -->|fetched live on every visit| P[Parents' page<br/>GitHub Pages]
   S -->|after edits + weekly<br/>Rebuild.gs| G[GitHub Actions<br/>pages.yml]
@@ -54,7 +54,7 @@ Columns (identical in both event tabs):
 | D | ימים | number of days | formula |
 | E | יום בשבוע | weekday(s), e.g. "שישי–שבת" | formula |
 | F | אירוע | event title | editor |
-| G | יומן | which calendar (dropdown, 6 options) – also sets the row colour | editor |
+| G | יומן | which calendar (dropdown, 5 options) – also sets the row colour | editor |
 | H | מתקיים | ✔ = happening. **Untick to cancel**: removed from calendar and page, row is struck through | editor (auto-ticked for new events) |
 | I | יום מלא | ✔ = all-day (multi-day events are always all-day) | editor (auto in the committee tab) |
 | J–K | שעת התחלה / שעת סיום | times, 08:00–20:00 in 30-min steps; default 17:00–20:00; blocked when all-day | editor |
@@ -69,7 +69,7 @@ columns (L, M) and the links tab. Editors can edit B–C, F–K and N–P in row
 rows at the bottom (they already carry the formulas and dropdowns) – they cannot insert or delete rows. To remove an
 event: untick **מתקיים** (keeps it visible as cancelled) or clear its cells.
 
-**Calendars** (`יומן`): שכבה צעירה, שכבה בוגרת, שכבת י״ב, טקסים וטיולים (events for everyone), רכזים, שנת שירות.
+**Calendars** (`יומן`): שכבה צעירה, שכבה בוגרת, שכבת י״ב, טקסים וטיולים (events for everyone), רכזים.
 
 ---
 
@@ -97,7 +97,7 @@ layout changed. Sort and sync share one lock, because the sync writes ids by row
 
 ## 3. The calendars
 
-Six public calendars (anyone can view, nobody but the owner can edit). The links tab in the sheet has, per calendar:
+Five public calendars (anyone can view, nobody but the owner can edit). The links tab in the sheet has, per calendar:
 an "add to Google Calendar" link, a web view / embed link, and an iCal link (iPhone, Outlook). Google Calendar
 subscribers see changes almost immediately; iCal subscribers when their app refreshes (can take hours).
 
@@ -149,13 +149,20 @@ Only the **halhats** accounts are used: Google = halhats@gmail.com, GitHub = hal
 
 | Secret | Kept in | Used for |
 |---|---|---|
-| Google OAuth token of halhats@gmail.com | local machine, `~/.config/gcloud/noar-halhats/token.json` (outside the repo) | `tools/` – deploying the Apps Script, one-off sheet changes |
+| Google OAuth token of halhats@gmail.com | local machine, `~/.config/secrets/halhats@gmail.com/google/` (outside the repo) | `tools/` – deploying the Apps Script, one-off sheet changes |
 | GitHub fine-grained token (repo `noar-halhats` only, *Actions: read and write*) | Apps Script → Script properties → `GITHUB_TOKEN` (backup copy in the same local folder) | `Rebuild.gs` triggering the workflow |
 | gh CLI login of halhats-dev | local machine, `~/.config/gh/hosts.yml` | pushes (via the repo-local git credential helper) and `gh` commands |
 
-The repo itself contains **no secrets**. A README in `~/.config/gcloud/noar-halhats/` describes each local file.
-Local-only, git-ignored: `CLAUDE.md` and `.claude/` (assistant instructions and an account guard), `site/dist/`,
-`site/data.json`.
+The repo itself contains **no secrets and no paths to them**. `tools/gauth.py` finds the Google token through
+`NOAR_GOOGLE_TOKEN` – set it in the environment, or once per machine:
+
+```bash
+cp .env.example .env   # then adjust the path if your token lives elsewhere
+```
+
+A README in `~/.config/secrets/halhats@gmail.com/` describes each local file.
+Local-only, git-ignored: `.env`, `CLAUDE.md` and `.claude/` (assistant instructions and an account guard),
+`site/dist/`, `site/data.json`.
 
 This clone is pinned to halhats-dev: commits are authored as `halhats-dev` (no-reply address), and the remote URL and
 the repo-local credential helper only ever use that account's token.
@@ -212,5 +219,5 @@ apps-script/                  the sheet's Apps Script (deployed with tools/deplo
   appsscript.json             manifest (time zone, web app access)
   deployment.json             web app deployment id + public URL
 site/                         the parents' page (template + build scripts + images)
-tools/                        local maintenance scripts (need the halhats Google token)
+tools/                        local maintenance scripts (need the halhats Google token, via NOAR_GOOGLE_TOKEN / .env)
 ```

@@ -8,7 +8,6 @@ const CALENDARS = {
   "נוער חלחצ - שכבה צעירה": "e70af05f4509027dadf52efa8f3e8eec8899e44cdd4a17a9f8fb968291a8f74f@group.calendar.google.com",
   "נוער חלחצ - שכבת י״ב": "d11b81d1d5e818c02fec6968299b50c5a64ec786538e5deb26705885771ff683@group.calendar.google.com",
   "נוער חלחצ - רכזים": "3f30a8fe77e7c35f558664713d6b6165549e07bb96da9e0a4823b520789b76bf@group.calendar.google.com",
-  "נוער חלחצ - שנת שירות": "1596f8b752f27001920e5eff64865fac2dc8f321b86ab8e261c2e4e8484a748a@group.calendar.google.com",
   "נוער חלחצ - טקסים וטיולים": "e3d3af0988e7632db8e1f0d9370e15cc6518cf4a340b981d576eb0535d940cec@group.calendar.google.com"
 };
 const TAG = 'sheetRowId';

@@ -37,21 +37,20 @@
     --c-12: #d9127d;
     --c-trips: #0b3a78;
     --c-coord: #b7790f;
-    --c-service: #9a4f86;
   }
   @media (prefers-color-scheme: dark) {
     :root:not([data-theme="light"]) {
       --bg: #141a16; --surface: #1d2520; --surface-2: #252f29; --text: #eef2ec; --muted: #a9b5ac;
       --line: #2f3a33; --brand: #4fb477; --brand-ink: #0d1a12; --sun: #f2b33d;
       --shadow: 0 1px 2px rgba(0,0,0,.3), 0 6px 18px rgba(0,0,0,.25);
-      --c-young: #8f9fe8; --c-old: #ff6b70; --c-12: #ff6fb5; --c-trips: #6ea8ff; --c-coord: #f2b33d; --c-service: #d99acb;
+      --c-young: #8f9fe8; --c-old: #ff6b70; --c-12: #ff6fb5; --c-trips: #6ea8ff; --c-coord: #f2b33d;
     }
   }
   :root[data-theme="dark"] {
     --bg: #141a16; --surface: #1d2520; --surface-2: #252f29; --text: #eef2ec; --muted: #a9b5ac;
     --line: #2f3a33; --brand: #4fb477; --brand-ink: #0d1a12; --sun: #f2b33d;
     --shadow: 0 1px 2px rgba(0,0,0,.3), 0 6px 18px rgba(0,0,0,.25);
-    --c-young: #8f9fe8; --c-old: #ff6b70; --c-12: #ff6fb5; --c-trips: #6ea8ff; --c-coord: #f2b33d; --c-service: #d99acb;
+    --c-young: #8f9fe8; --c-old: #ff6b70; --c-12: #ff6fb5; --c-trips: #6ea8ff; --c-coord: #f2b33d;
   }
 
   * { box-sizing: border-box; }
@@ -333,7 +332,6 @@ const CALS = [
   { key: 'שכבת י״ב',       label: 'שכבת י״ב',     sub: '',        color: 'var(--c-12)',    kids: true },
   { key: 'טקסים וטיולים', label: 'טקסים וטיולים', sub: 'לכולם',  color: 'var(--c-trips)', kids: true },
   { key: 'רכזים',          label: 'רכזים',         sub: '',        color: 'var(--c-coord)', kids: false },
-  { key: 'שנת שירות',      label: 'שנת שירות',     sub: '',        color: 'var(--c-service)', kids: false },
 ];
 const CAL = Object.fromEntries(CALS.map(c => [c.key, c]));
 const MONTHS = ['ינואר','פברואר','מרץ','אפריל','מאי','יוני','יולי','אוגוסט','ספטמבר','אוקטובר','נובמבר','דצמבר'];
@@ -375,7 +373,7 @@ loadEvents(DATA);
 
 let selected = new Set(store.get('cals', ['שכבה צעירה', 'שכבה בוגרת', 'שכבת י״ב', 'טקסים וטיולים']).filter(k => CAL[k]));
 let showPast = store.get('past', false);
-let staffOpen = selected.has('רכזים') || selected.has('שנת שירות');
+let staffOpen = selected.has('רכזים');
 
 function chip(c) {
   const b = document.createElement('button');
