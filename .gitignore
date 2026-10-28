@@ -4,5 +4,7 @@ CLAUDE.md
 # build output and fetched data (the GitHub Action rebuilds both)
 site/dist/
 site/data.json
+# local configuration (points at secrets outside the repo)
+.env
 __pycache__/
 node_modules/
